@@ -1,5 +1,18 @@
 const Product = require("../src/db/models/product");
 const Comment = require("../src/db/models/comment");
+const mongoose = require("mongoose");
+
+const commets = (commentIds) => {
+  return Comment.find({ _id: { $in: commentIds } })
+    .then((commets) => {
+      return commets.map((comment) => {
+        return { ...comment._doc, _id: comment.id };
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
 
 module.exports = resolvers = {
   Mutation: {
@@ -49,6 +62,23 @@ module.exports = resolvers = {
         .catch((err) => {
           console.log(err);
         });
+    },
+  },
+
+  //  --------------------------------------------------------
+
+  Query: {
+    product: async (parent, args, context, info) => {
+      try {
+        const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
+        console.log(result);
+        return {
+          ...result._doc,
+          comments: commets.bind(this, result._doc.comments),
+        };
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
