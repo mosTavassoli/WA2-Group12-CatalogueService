@@ -6,8 +6,7 @@ const commentSchema = new mongoose.Schema({
     required: true,
   },
   body: {
-    trype: String,
-    required: true,
+    type: String,
   },
   stars: {
     type: Number,
@@ -20,4 +19,4 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = mongoose.model("Cooment", commentSchema);

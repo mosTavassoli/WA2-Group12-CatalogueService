@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
     enum: ["STYLE", "FOOD", "TECH", "SPORT"],
     required: true,
   },
-  star: Number,
+  stars: Number,
 });
 
 module.exports = mongoose.model("Product", productSchema);
