@@ -71,6 +71,7 @@ module.exports = resolvers = {
 
   //  ----------------------- Query Type ---------------------------------
 
+  // TODO RAZI ==  comments (numberOfLastRecentComments: Int) ===> look at the PDF
   Query: {
     product: async (parent, args, context, info) => {
       try {
@@ -87,27 +88,75 @@ module.exports = resolvers = {
 
     products: async (parent, args, context, info) => {
       const { filter, sort } = args;
-      let value = sort.value;
+      // console.log(sort);
+      // let value = sort.value;
       let filterCat;
-      if ("categories" in filter) {
+      let value;
+      let order;
+
+      if (typeof filter != "undefined" && "categories" in filter) {
         filterCat = filter.categories[0];
       } else {
         filterCat = null;
       }
-      let products;
-      if (Object.keys(filter).length === 0) {
-        products = await Product.find();
+      if (typeof sort == "undefined") {
+        value = null;
+        order = null;
       } else {
-        products = await Product.find({
-          $or: [
-            { stars: { $gt: filter.minStars } },
-            // { $or: [{ category: null }, { category: { $in: filterCat } }] },
-            { category: { $in: filterCat } },
-            { price: { $gt: filter.minPrice } },
-            { price: { $lt: filter.maxPrice } },
-          ],
-        }).sort([[value, sort.order]]);
+        value = sort.value;
+        order = sort.order;
       }
+      let products;
+      if (typeof filter == "undefined" || Object.keys(filter).length === 0) {
+        products = await Product.find().sort([[value, order]]);
+      } else {
+        //TODO filter == Siavash ===== the filter Part
+        if (
+          "categories" in filter &&
+          "minStars" in filter &&
+          "minPrice" in filter &&
+          "maxPrice" in filter
+        ) {
+          products = await Product.find({
+            $and: [
+              {
+                stars: { $gte: filter.minStars },
+                category: { $in: filterCat },
+                // price: { $gte: filter.minPrice },
+                $or: [
+                  { price: { $gte: filter.minPrice } },
+                  { price: { $gte: filter.maxPrice } },
+                ],
+              },
+            ],
+          }).sort([[value, order]]);
+        }
+        if (
+          "categories" in filter &&
+          "minStars" in filter &&
+          "minPrice" in filter
+        ) {
+          products = await Product.find({
+            $and: [
+              {
+                stars: { $gte: filter.minStars },
+                category: { $in: filterCat },
+                // price: { $gte: filter.minPrice },
+                price: { $gte: filter.minPrice },
+              },
+            ],
+          }).sort([[value, order]]);
+        } else if ("categories" in filter) {
+          products = await Product.find({
+            category: { $in: filterCat },
+          }).sort([[value, order]]);
+        } else if ("minStars" in filter) {
+          products = await Product.find({
+            stars: { $gte: filter.minStars },
+          }).sort([[value, order]]);
+        }
+      }
+      //TODO filter == Siavash =====
       return products.map((product) => {
         return {
           _id: product.id,
