@@ -1,7 +1,10 @@
-const Product = require("../src/db/models/product");
-const Comment = require("../src/db/models/comment");
-const mongoose = require("mongoose");
-const { asArray } = require("@graphql-tools/utils");
+import Product from "../src/db/models/product";
+import Comment from "../src/db/models/comment";
+import mongoose from "mongoose";
+
+// const Product = require("../src/db/models/product");
+// const Comment = require("../src/db/models/comment");
+// const mongoose = require("mongoose");
 
 const commets = (commentIds) => {
   return Comment.find({ _id: { $in: commentIds } })
@@ -14,8 +17,7 @@ const commets = (commentIds) => {
       throw err;
     });
 };
-
-module.exports = resolvers = {
+export const resolvers = {
   //  ----------------------- Mutation Type ---------------------------------
   Mutation: {
     productCreate: (parent, args, context, info) => {

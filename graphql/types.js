@@ -1,4 +1,4 @@
-module.exports = typeDefs = `
+export const typeDefs = `
 
 scalar DateTime,
 enum ProductCategory {
