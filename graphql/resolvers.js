@@ -2,10 +2,6 @@ import Product from "../src/db/models/product";
 import Comment from "../src/db/models/comment";
 import mongoose from "mongoose";
 
-// const Product = require("../src/db/models/product");
-// const Comment = require("../src/db/models/comment");
-// const mongoose = require("mongoose");
-
 const commets = (commentIds) => {
   return Comment.find({ _id: { $in: commentIds } })
     .then((commets) => {
@@ -31,7 +27,7 @@ export const resolvers = {
       return productObj
         .save()
         .then((result) => {
-          console.log(result);
+          // console.log(result);
           return { ...result._doc };
         })
         .catch((err) => {
@@ -62,7 +58,7 @@ export const resolvers = {
           return product.save();
         })
         .then((result) => {
-          console.log(result);
+          // console.log(result);
           return createdComment;
         })
         .catch((err) => {
@@ -78,7 +74,7 @@ export const resolvers = {
     product: async (parent, args, context, info) => {
       try {
         const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
-        console.log(result);
+        // console.log(result);
         return {
           ...result._doc,
           comments: commets.bind(this, result._doc.comments),
@@ -90,8 +86,6 @@ export const resolvers = {
 
     products: async (parent, args, context, info) => {
       const { filter, sort } = args;
-      // console.log(sort);
-      // let value = sort.value;
       let filterCat;
       let value;
       let order;
@@ -113,16 +107,16 @@ export const resolvers = {
         products = await Product.find().sort([[value, order]]);
       } else {
         var query = Product.find();
-        if( filter.minStars !== undefined ) {
-            query.where('stars').gte(filter.minStars)
+        if (filter.minStars !== undefined) {
+          query.where("stars").gte(filter.minStars);
         }
-        if( filter.categories !== undefined ) {
-            query.where("category").in(filterCat);
+        if (filter.categories !== undefined) {
+          query.where("category").in(filterCat);
         }
-        if( filter.minPrice !== undefined ) {
+        if (filter.minPrice !== undefined) {
           query.where("price").gte(filter.minPrice);
         }
-        if( filter.maxPrice !== undefined ) {
+        if (filter.maxPrice !== undefined) {
           query.where("price").lte(filter.maxPrice);
         }
         products = await Product.find(query).sort([[value, order]]);

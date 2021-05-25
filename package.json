@@ -16,7 +16,8 @@
     "graphql": "^15.5.0",
     "graphql-tools": "^7.0.5",
     "mongodb": "^3.6.7",
-    "mongoose": "^5.12.10"
+    "mongoose": "^5.12.10",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
