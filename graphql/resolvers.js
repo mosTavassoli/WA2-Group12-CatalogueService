@@ -2,19 +2,17 @@ import Product from "../src/db/models/product";
 import Comment from "../src/db/models/comment";
 import mongoose from "mongoose";
 
-// const commets = async (commentIds) => {
-//   console.log(commentIds);
-//   let result = await Comment.find({ _id: { $in: commentIds } })
-//     .then((commets) => {
-//       return commets.map((comment) => {
-//         return { ...comment._doc, _id: comment.id };
-//       });
-//     })
-//     .catch((err) => {
-//       throw err;
-//     });
-//   console.log(result);
-// };
+const comments = async (commentIds) => {
+  return await Comment.find({ _id: { $in: commentIds } })
+    .then((comments) => {
+      return comments.map((comment) => {
+        return { ...comment._doc, _id: comment.id };
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
 
 export const resolvers = {
   //  ----------------------- Mutation Type ---------------------------------
@@ -76,23 +74,12 @@ export const resolvers = {
       let resultComments = [];
       try {
         const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
+        resultComments = await comments(result._doc.comments);
+        // console.log(resultComments);
         return {
           ...result._doc,
-          // comments: commets.bind(this, result._doc.comments),
-          comments: async (numberOfLastRecentComments) => {
+          comments: (numberOfLastRecentComments) => {
             let last = numberOfLastRecentComments.numberOfLastRecentComments;
-            resultComments = await Comment.find({
-              _id: { $in: result._doc.comments },
-            })
-              .then((commets) => {
-                return commets.map((comment) => {
-                  return { ...comment._doc, _id: comment.id };
-                });
-              })
-              .catch((err) => {
-                throw err;
-              });
-
             if (resultComments.length >= last) {
               return resultComments.reverse().slice(0, last);
             }
@@ -148,7 +135,7 @@ export const resolvers = {
           createdAt: product.createdAt,
           description: product.description,
           price: product.price,
-          comments: commets.bind(this, product._doc.comments),
+          comments: comments.bind(this, product._doc.comments),
           category: product.category,
           stars: product.stars,
         };
@@ -156,3 +143,26 @@ export const resolvers = {
     },
   },
 };
+
+/// Alternative to Query numberOfLastRecentComments
+// resultComments: commets.bind(this, result._doc.comments),
+// resultComments: commets.bind(this, result._doc.comments),
+//   comments: async (numberOfLastRecentComments) => {
+//     let last = numberOfLastRecentComments.numberOfLastRecentComments;
+//     resultComments = await Comment.find({
+//       _id: { $in: result._doc.comments },
+//     })
+//       .then((commets) => {
+//         return commets.map((comment) => {
+//           return { ...comment._doc, _id: comment.id };
+//         });
+//       })
+//       .catch((err) => {
+//         throw err;
+//       });
+
+//     if (resultComments.length >= last) {
+//       return resultComments.reverse().slice(0, last);
+//     }
+//     return resultComments.reverse();
+//   },
