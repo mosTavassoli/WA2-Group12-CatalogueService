@@ -2,17 +2,20 @@ import Product from "../src/db/models/product";
 import Comment from "../src/db/models/comment";
 import mongoose from "mongoose";
 
-const commets = (commentIds) => {
-  return Comment.find({ _id: { $in: commentIds } })
-    .then((commets) => {
-      return commets.map((comment) => {
-        return { ...comment._doc, _id: comment.id };
-      });
-    })
-    .catch((err) => {
-      throw err;
-    });
-};
+// const commets = async (commentIds) => {
+//   console.log(commentIds);
+//   let result = await Comment.find({ _id: { $in: commentIds } })
+//     .then((commets) => {
+//       return commets.map((comment) => {
+//         return { ...comment._doc, _id: comment.id };
+//       });
+//     })
+//     .catch((err) => {
+//       throw err;
+//     });
+//   console.log(result);
+// };
+
 export const resolvers = {
   //  ----------------------- Mutation Type ---------------------------------
   Mutation: {
@@ -68,16 +71,33 @@ export const resolvers = {
   },
 
   //  ----------------------- Query Type ---------------------------------
-
-  // TODO RAZI ==  comments (numberOfLastRecentComments: Int) ===> look at the PDF
   Query: {
     product: async (parent, args, context, info) => {
+      let resultComments = [];
       try {
         const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
-        // console.log(result);
         return {
           ...result._doc,
-          comments: commets.bind(this, result._doc.comments),
+          // comments: commets.bind(this, result._doc.comments),
+          comments: async (numberOfLastRecentComments) => {
+            let last = numberOfLastRecentComments.numberOfLastRecentComments;
+            resultComments = await Comment.find({
+              _id: { $in: result._doc.comments },
+            })
+              .then((commets) => {
+                return commets.map((comment) => {
+                  return { ...comment._doc, _id: comment.id };
+                });
+              })
+              .catch((err) => {
+                throw err;
+              });
+
+            if (resultComments.length >= last) {
+              return resultComments.slice(0, last);
+            }
+            return resultComments;
+          },
         };
       } catch (error) {
         console.log(error);
