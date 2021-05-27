@@ -94,9 +94,9 @@ export const resolvers = {
               });
 
             if (resultComments.length >= last) {
-              return resultComments.slice(0, last);
+              return resultComments.reverse().slice(0, last);
             }
-            return resultComments;
+            return resultComments.reverse();
           },
         };
       } catch (error) {
