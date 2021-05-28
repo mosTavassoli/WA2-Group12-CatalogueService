@@ -19,11 +19,13 @@ export const resolvers = {
   Mutation: {
     productCreate: (parent, args, context, info) => {
       const { name, description, price, category } = args.productCreateInput;
+      const stars = 0
       const productObj = new Product({
         name,
         description,
         price,
         category,
+        stars
       });
       return productObj
         .save()
@@ -37,6 +39,8 @@ export const resolvers = {
 
     commentCreate: (parent, args, context, info) => {
       const { title, body, stars } = args.commentCreateInput;
+      if (stars < 1 || stars > 5) 
+        throw new Error("Stars range should be between 1 to 5 !");
       const commentObj = new Comment({
         title,
         body,
@@ -51,7 +55,7 @@ export const resolvers = {
         })
         .then((product) => {
           if (!product) {
-            throw new Error("Product Does not exist !!");
+            throw new Error("Product does not exist !!");
           }
           product.comments.push(commentObj);
           product.stars = createdComment.stars;
@@ -72,11 +76,15 @@ export const resolvers = {
       let resultComments = [];
       try {
         const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
-        resultComments = await comments(result._doc.comments);
+        console.log(result) 
+        console.log(result._doc.comments);    
+           resultComments = await comments(result._doc.comments);
+        console.log(resultComments)
         return {
           ...result._doc,
           comments: ({ numberOfLastRecentComments }) => {
             // let last = numberOfLastRecentComments.numberOfLastRecentComments;
+            console.log(numberOfLastRecentComments)
             if (resultComments.length >= numberOfLastRecentComments) {
               return resultComments
                 .reverse()
