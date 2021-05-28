@@ -28,7 +28,6 @@ export const resolvers = {
       return productObj
         .save()
         .then((result) => {
-          // console.log(result);
           return { ...result._doc };
         })
         .catch((err) => {
@@ -59,7 +58,6 @@ export const resolvers = {
           return product.save();
         })
         .then((result) => {
-          // console.log(result);
           return createdComment;
         })
         .catch((err) => {
@@ -75,13 +73,14 @@ export const resolvers = {
       try {
         const result = await Product.findOne(mongoose.Types.ObjectId(args.id));
         resultComments = await comments(result._doc.comments);
-        // console.log(resultComments);
         return {
           ...result._doc,
-          comments: (numberOfLastRecentComments) => {
-            let last = numberOfLastRecentComments.numberOfLastRecentComments;
-            if (resultComments.length >= last) {
-              return resultComments.reverse().slice(0, last);
+          comments: ({ numberOfLastRecentComments }) => {
+            // let last = numberOfLastRecentComments.numberOfLastRecentComments;
+            if (resultComments.length >= numberOfLastRecentComments) {
+              return resultComments
+                .reverse()
+                .slice(0, numberOfLastRecentComments);
             }
             return resultComments.reverse();
           },
@@ -143,26 +142,3 @@ export const resolvers = {
     },
   },
 };
-
-/// Alternative to Query numberOfLastRecentComments
-// resultComments: commets.bind(this, result._doc.comments),
-// resultComments: commets.bind(this, result._doc.comments),
-//   comments: async (numberOfLastRecentComments) => {
-//     let last = numberOfLastRecentComments.numberOfLastRecentComments;
-//     resultComments = await Comment.find({
-//       _id: { $in: result._doc.comments },
-//     })
-//       .then((commets) => {
-//         return commets.map((comment) => {
-//           return { ...comment._doc, _id: comment.id };
-//         });
-//       })
-//       .catch((err) => {
-//         throw err;
-//       });
-
-//     if (resultComments.length >= last) {
-//       return resultComments.reverse().slice(0, last);
-//     }
-//     return resultComments.reverse();
-//   },
