@@ -1,4 +1,4 @@
-module.exports = typeDefs = `
+export const typeDefs = `
 
 scalar DateTime,
 enum ProductCategory {
@@ -39,7 +39,7 @@ type Product {
     createdAt: DateTime!,
     description: String,
     price: Float!,
-    comments (last: Int) : [Comment],
+    comments (numberOfLastRecentComments: Int) : [Comment],
     category: ProductCategory!,
     stars: Float
 },

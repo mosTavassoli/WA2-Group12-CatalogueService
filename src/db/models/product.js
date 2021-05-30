@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
     enum: ["STYLE", "FOOD", "TECH", "SPORT"],
     required: true,
   },
-  star: Number,
+  stars: Number,
 });
 
-module.exports = mongoose.model("Product", productSchema);
+export default mongoose.model("Product", productSchema);

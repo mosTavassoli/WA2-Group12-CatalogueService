@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
   title: {
@@ -6,8 +6,7 @@ const commentSchema = new mongoose.Schema({
     required: true,
   },
   body: {
-    trype: String,
-    required: true,
+    type: String,
   },
   stars: {
     type: Number,
@@ -20,4 +19,5 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Comment", commentSchema);
+// module.exports = mongoose.model("Coment", commentSchema);
+export default mongoose.model("Comment", commentSchema);
